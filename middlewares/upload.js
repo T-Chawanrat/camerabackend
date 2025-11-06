@@ -1,15 +1,24 @@
+// middleware/upload.js
 import multer from "multer";
 import path from "path";
+import fs from "fs";
 
-// กำหนดตำแหน่งเก็บไฟล์
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/"); // ต้องมีโฟลเดอร์นี้อยู่จริง
+    const dir = "uploads";
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir);
+    cb(null, dir);
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname)); // ตั้งชื่อไฟล์ใหม่
+    if (file.fieldname === "signature") {
+      cb(null, "signature_" + Date.now() + path.extname(file.originalname));
+    } else {
+      cb(null, "image_" + Date.now() + path.extname(file.originalname));
+    }
   },
 });
 
-const upload = multer({ storage });
-export default upload;
+export const upload = multer({ 
+  storage,
+  limits: { files: 9 }
+});
