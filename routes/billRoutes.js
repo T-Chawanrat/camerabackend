@@ -3,8 +3,9 @@ import {
   createBill,
   getBill,
   getBills,
+  downloadImage,
 } from "../controllers/billController.js";
-import { upload } from "../middlewares/upload.js"; // import จาก middleware
+import { upload } from "../middlewares/upload.js";
 
 const router = express.Router();
 
@@ -19,5 +20,6 @@ router.post(
 
 router.get("/bills/:id", getBill);
 router.get("/bills", getBills);
+router.get("/bills/:id/downloadImage", downloadImage);
 
 export default router;

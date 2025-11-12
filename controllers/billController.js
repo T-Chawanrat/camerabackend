@@ -152,3 +152,50 @@ export const getBills = async (req, res) => {
     if (connection) connection.release();
   }
 };
+
+export const downloadImage = async (req, res) => {
+  let connection;
+  try {
+    connection = await db.getConnection();
+    const billId = req.params.id;
+
+    const [billRows] = await connection.query(
+      `SELECT sign FROM bills WHERE id = ?`,
+      [billId]
+    );
+
+    if (billRows.length === 0) {
+      return res.status(404).json({ message: "ไม่พบบิลนี้" });
+    }
+
+    const bill = billRows[0];
+
+    const [imageRows] = await connection.query(
+      `SELECT image_url FROM bill_images WHERE bill_id = ?`,
+      [billId]
+    );
+
+    const DOMAIN = "https://xsendwork.com";
+    const fileUrls = [];
+
+    if (bill.sign) {
+      fileUrls.push(`${DOMAIN}/${bill.sign}`);
+    }
+
+    for (const img of imageRows) {
+      if (img.image_url) {
+        fileUrls.push(`${DOMAIN}/${img.image_url}`);
+      }
+    }
+
+    res.status(200).json({ files: fileUrls });
+  } catch (err) {
+    console.error("Error in downloadImage:", err);
+    res.status(500).json({
+      message: "เกิดข้อผิดพลาดในการดึงไฟล์",
+      error: err.message,
+    });
+  } finally {
+    if (connection) connection.release();
+  }
+};
