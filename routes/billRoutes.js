@@ -5,6 +5,7 @@ import {
   getBills,
   downloadImage,
 } from "../controllers/billController.js";
+import { login } from "../controllers/authController.js";
 import { upload } from "../middlewares/upload.js";
 
 const router = express.Router();
@@ -18,6 +19,7 @@ router.post(
   createBill
 );
 
+router.post("/login", login);
 router.get("/bills/:id", getBill);
 router.get("/bills", getBills);
 router.get("/bills/:id/downloadImage", downloadImage);
